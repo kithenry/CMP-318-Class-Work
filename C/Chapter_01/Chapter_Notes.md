@@ -1,6 +1,8 @@
 # Super Brief Notes
 
-## Chapter 1.1
+## Chapter 1 ( Tutorial Intro)
+
+### Chapter 1.1
 - A C programme consists of functions and variables
 --
 - Every C programme must have the`main` function.
@@ -16,9 +18,10 @@
 
 --
 
-## Chapter 1.2
+### Chapter 1.2
 
-### Sample Programme;
+Sample Programme;
+
 ```
 #include <stdio.h>
 /* print Fahrenheit-Celsius table
@@ -58,5 +61,77 @@ main()
 - prinft out puts while scanf reads input from the user
 - in an operation with both integers and floats, the ints are first converted to floats before the operation is executed.
 
+### Chapter 1.3
+
+- The For Statement
+```
+#include <stdio.h>16
+/* print Fahrenheit-Celsius table */
+main()
+{
+    int fahr;
+    for (fahr = 0; fahr <= 300; fahr = fahr + 20)
+        printf("%3d %6.1f\n", fahr, (5.0/9.0)*(fahr-32));
+}
+```
+- the for loop is a generalization of the while loop.
+- `fahr = 0` is the initialization: It is run only once.
+- `fahr <= 300` is the condition based on whose truth the loop statements run
+- if the check evaluates to true, the loop statements are run, the third part is executed (`fahr = fahr + 20` , then the check is evaluated once more and the cycle continues till the checkis false
+
+### Chapter 1.4
+
+- Symbolic names : values that will be used often can be defined as `symbolic constants` at the top of a programme.
+- Example: `#define LOWER 0 /*lower limit of table */` defines a symbolic constant lower with the value 0.
+- There is no semi colon at the end of the declaration and the names are written in caps.
+
+### Chapter 1.5
+
+- Character input and output.
+- C deals with all kinds of text input as streams of characters.
+- A text stream: Sequence of line seperated characters, including empty (0 character lines)
+- `getchar` and `putchar` are C functions for reading or writing a single `char` for every call, respectively 
+- `char c = getchar(); // gets a character from stdin and stores it in c`
+- `putchar(c); // outputs the character stored in c`
+
+#### Chapter 1.5.1
+
+- File Copying
+Sample Programme
+```
+//read a character
+//while (charater is not end-of-file indicator)
+//  output the character just read
+//  read a character
+//Converting this into C gives:
+#include <stdio.h>
+/* copy input to output; 1st version */
+main()
+{
+    int c;
+    c = getchar();
+    while (c != EOF) {
+    putchar(c);
+    c = getchar();
+    }
+}
+```
+- We know there is no more input when getchar() returns an`EOF`. (End Of File)
+- `char` can't be used since it is not big enough to hold the size of `EOF`.
+- Any expression has a value can can be used as a part of a larger expression.
+- ` a = (c = getchar()); // gets a character from stdin, stores it in c, hands the value of c as a copy to a.
+
+```
+#include <stdio.h>
+/* copy input to output; 2nd version 
+*/
+main()
+{
+    int c;
+    while ((c = getchar()) != EOF)
+        putchar(c);
+}
+
+#### Chapter 1.5.2
 
 
