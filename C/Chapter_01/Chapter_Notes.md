@@ -119,7 +119,7 @@ main()
 - We know there is no more input when getchar() returns an`EOF`. (End Of File)
 - `char` can't be used since it is not big enough to hold the size of `EOF`.
 - Any expression has a value can can be used as a part of a larger expression.
-- ` a = (c = getchar()); // gets a character from stdin, stores it in c, hands the value of c as a copy to a.
+- ` a = (c = getchar()); // gets a character from stdin, stores it in c, hands the value of c as a copy to a.`
 
 ```
 #include <stdio.h>
@@ -131,7 +131,7 @@ main()
     while ((c = getchar()) != EOF)
         putchar(c);
 }
-
+```
 #### Chapter 1.5.2
 
 
