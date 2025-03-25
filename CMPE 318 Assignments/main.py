@@ -1,51 +1,59 @@
 from datetime import datetime
 
+### GLOBALS  ###
+date_format = "%d-%m-%Y"
+
+
 ###  CLASSES  ###
 class Student:
-    def __init__(self, num, fn, ln, dob, g, cy):
-        self.__num = num
-        self.__fn = fn
-        self.__ln = ln
-        self.__dob = datetime.strptime(dob, '%d-%m-%Y')
-        self.__g = g          
-        self.__cy = cy        
+    def __init__(self, student_number, first_name, last_name, dob, gender, country):
+        self.__student_number = student_number
+        self.__first_name = first_name
+        self.__last_name = last_name
+        self.__dob = datetime.strptime(dob, date_format)
+        self.__gender = gender          
+        self.__country = country        
 
-		# GET/SET STUDENT NUMBER
-    def get_num(self):
-        return self.__num
-    def set_num(self, x):
-        self.__num = x
-        snum = str(self.__num)
-        print ("Student number have been changed to " + snum)
+	# GET/SET STUDENT NUMBER
+    def get_student_number(self):
+        return self.__student_number
+    def set_student_number(self, x):
+        self.__student_number = x
+        updated_student_number = str(self.__student_number)
+        print ("Student number have been changed to " + updated_student_number)
 		
     #GET/SET FIRST NAME
-    def get_fn(self):
-        return self.__fn
-    def set_fn(self, x):   
-        self.__fn = x
+    def get_first_name(self):
+        return self.__first_name
+    def set_first_name(self, x):   
+        self.__first_name = x
+        print(f"Student now has a new first name {self.get_first_name()}")
 		
     #GET/SET LAST NAME
-    def get_ln(self):
-        return self.__ln    
-    def set_ln(self, x):
-        self.__ln = x
+    def get_last_name(self):
+        return self.__last_name    
+    def set_last_name(self, x):
+        self.__last_name = x
+        print(f"Student now has a new last name: {self.get_last_name()}")
 		
     #GET/SET DOB
     def get_dob(self):
         return self.__dob    
     def set_dob(self):     
-        x = input("Enter your date of birth (DD-MM-YYYY): ")
+        x = input("Enter your date of birth\nUse the format (DD-MM-YYYY): ")
         self.__dob = datetime.strptime(x, '%d-%m-%Y')
+        print(f"Student now has a new DOB: {self.get_dob()}")
 
     #GET/SET GENDER
-    def get_gen(self):
-        return self.__g
-    def set_gen(self, x):
-        self.__g = x
+    def get_gender(self):
+        return self.__gender
+    def set_gender(self, x):
+        self.__gender = x
+        print(f"Student now has a new gender! Student is {self.get_gender()}")
 
     #GET/SET COUNTRY
     def get_country(self):
-        return self.__cy
+        return self.__country
     def set_country(self, x):
         self.__country = x    
 
@@ -53,7 +61,11 @@ class Student:
     def get_age(self):
         today = datetime.now()
         age = today.year - self.__dob.year - ((today.month, today.day) < (self.__dob.month, self.__dob.day))
-        print(age)
+        return age
+
+    #GET FULL NAME
+    def get_full_name(self):
+        return f"{self.get_first_name().capitalize()} {self.get_last_name().capitalize()}"
 
 ### END OF CLASS ###
 
@@ -69,20 +81,21 @@ def export_students(student_list, filename="students.txt"):
             if student is not None:  
               # seperated by | for easier importing
                 student_data = (
-                    f"{student.get_num()}|"
-                    f"{student.get_fn()}|"
-                    f"{student.get_ln()}|"
-                    f"{student.get_dob().strftime('%d-%m-%Y')}|"
-                    f"{student.get_gen()}|"
+                    f"{student.get_student_number()}|"
+                    f"{student.get_first_name()}|"
+                    f"{student.get_last_name()}|"
+                    f"{student.get_dob().strftime(date_format)}|"
+                    f"{student.get_gender()}|"
                     f"{student.get_country()}\n"
                 )
                 file.write(student_data)
-    print(f"Students exported to {filename}")
+    print(f"Student records successfully written to {filename}!")
 
 
 
 def import_students(filename="students.txt"):
-    students = [None] * 100  
+    students = [] # edited
+    print("importing students")
     try:
         with open(filename, 'r') as file:
             for i, line in enumerate(file):
@@ -102,127 +115,195 @@ def import_students(filename="students.txt"):
                             fields[4],  
                             fields[5]   
                         )
-                        students[i] = student
+                        students.append(student)
         print(f"Students imported from {filename}")
         return students
       
     #Error handling
     except FileNotFoundError:
-        print(f"File {filename} not found")
+        print(f"The file {filename} was not found")
         return students
     except Exception as e:
         print(f"Error reading file: {str(e)}")
         return students
 
-def show_student_data(student):
-    print(f" Student Number:    {student.get_num()}")
-    print(f" First Name:        {student.get_fn()}")
-    print(f" Last Name:         {student.get_ln()}")
-    print(f" Age:               {student.get_dob()}")
-    print(f" Gender:            {student.get_gen()}")
-    print(f" Country or Origin: {student.get_country()}")
-
-
-def show_all_student_data(students):
-    print("====== Dumping all available student data ======")
-    for i, student in enumerate(students, start=1):
-        print(f"Student {i}")
-        show_student_data(student)
-    # for each student in the student list
-    # print out their: student number, first name, lastname, gender, age
 
 def handle_exit():
-    print("Quitting program .....")
+    print("Alright.. quitting program .....")
     exit(0)
 
-def modify_student_record(students):
-    student_numbers = [str(student.get_num()) for student in students]
-    chosen_number = input("Input student number for student whose record you want to modify\nMust be a number: ")
-    while(chosen_number not in student_numbers and chosen_number != 'q'):
-        print("Please enter a valid student number.\nYou can enter 'q' to quit or choose a proper number from those below:\n")
-        for i, number in enumerate(student_numbers, start=1):
-            print(f"{i}. {number}")
-    if(chosen_number == 'q'):
-        handle_exit()
-    chosen_student = [std for std in students if std.get_num() == chosen_number][0]
-    show_student_data(chosen_student)
-    record_to_modify = input("Choose from the above which record you want to modify\n")
+class StudentDatabase:
+    def __init__(self):
+        self.students = import_students()
 
-        
+    def add_student(self, student):
+        if len(self.students) < 100:
+            self.students.append(student)
+            self.update_database()
+        else:
+            print("Oops! No space left. Student database is full :\\")
+
+    def find_student_by_number(self, student_number):
+        for student in self.students:
+            if student.get_student_number() == student_number:
+                return student
+        return None
+
+    def remove_student(self, student_number):
+        student = self.find_student_by_number(student_number)
+        if student:
+            self.students.remove(student)
+            print(f"Student with number {student_number} has been wiped from the records.")
+            self.update_database()
+        else:
+            print(f"I think we don't have {student_number} in our records. Check that again.")
+            print(f"You can choose main menu option five to select the desired student's number")
+
+    def modify_student(self, student_number): # this was also kith's task but thanks again , heheeh
+        student = self.find_student_by_number(student_number)
+        fields = "first name, last name, date of birth, gender, country of birth".split(",")
+        if student:
+            print("Select field to modify:")
+            print("1. First Name")
+            print("2. Last Name")
+            print("3. Date of Birth")
+            print("4. Gender")
+            print("5. Country of Birth")
+            choice = input("Your choice must be integer in the range(1-5): ") # error check (try except block)
+            run = True 
+            while (run):
+                if(choice == 'q'):
+                    pass # handle quit
+                if (choice not in '1 2 3 4 5'.split()):
+                    print("[BAD INPUT!!\nInput must be an one of integers 1,2,3,4,5 from above]: ")
+                    print("And... you may quit anytime by entering 'q'")
+                    choice = input("Now try that again:[1,2,3,4,5] Go: ")
+                    continue
+                choice  = int(choice)
+                run = False 
+            
+            new_value = input(f"Okay, noted.\nNow enter new {fields[choice-1]} value for {student.get_full_name()}: ")
+            if choice == 1:
+                student.set_first_name(new_value)
+            elif choice == 2:
+                student.set_last_name(new_value)
+            elif choice == 3:
+                student.set_dob(new_value)
+            elif choice == 4:
+                student.set_gender(new_value)
+            elif choice == 5:
+                student.set_country(new_value)
+            
+        else:
+            print(f"Student with number {student_number} not found.")
     
+    def show_student_data(self,student):
+        print(f" Student Number:    {student.get_student_number()}")
+        print(f" First Name:        {student.get_first_name()}")
+        print(f" Last Name:         {student.get_last_name()}")
+        print(f" Age:               {student.get_age()}")
+        print(f" Gender:            {student.get_gender()}")
+        print(f" Country or Origin: {student.get_country()}")
 
+    def show_all_students(self): # this was kith's task but thanks.. hehee
+        print()
+        print("====== Retrieving all stored student data ======")
+        if not self.students:
+            print("Oops! there's no students stored!")
+            print("You can add a new student entry via main menu option 3")
+            print("You can also load your own student file via menu option 2")
+        else:
+            for i,student in enumerate(self.students, start=1):
+                print(f"Student {i}")
+                print()
+                self.show_student_data(student)
+                print()
+                print()
+            print("That's all of them...")
+
+    def show_students_born_in_year(self, year):
+        found = False
+        for student in self.students:
+            if student.get_dob().year == year:
+                found = True
+                print()
+                print()
+                self.show_student_data(student)
+        if not found:
+            print(f"No students born in the year {year}.")
+
+    def read_from_file(self, filename):
+        self.students = import_students(filename)
+    # also functions as utility for writing to custom file
+    def update_database(self, filename='students.txt'):
+        export_students(self.students, filename)
+
+
+def menu():
+    global date_format
+    db = StudentDatabase()
+    run = True 
+    while run:
+        print("\nStudent Database Menu")
+        print("1. Write to file")
+        print("2. Read from file")
+        print("3. Add a new student")
+        print("4. Find student by number")
+        print("5. Show all students")
+        print("6. Show students born in a specific year")
+        print("7. Modify student record")
+        print("8. Delete a student")
+        print("9. Exit")
         
-    
-    pass
-    # ask for which student to modify
-    # confirm student is in list
-    # ask for what needs to be modified (show what can be modified)
-    # check if it is one of the properties 
-    # modify student object in question and give feedback on how that went
-
-
-###  END OF FUNCTIONS ###
-
-def main():
-    # main code to be run from here
-    student_list = import_students()
-    running = True
-    while(running):
-        print("=== FILE BASED STUDENT DATA MANAGEMENT APPLICATION ====")
-        print("Available Features: ")
-        print("1. Add new student to file ")
-        print("2. Find student by student number and show all information stored on them")
-        print("3. Show for each student, all data stored in data file")
-        print("4. Show students that were born in a particular year")
-        print("5. Modify student details for particular student")
-        print("6. Delete student of choice from record (choose from available student numbers)")
-        print("7. Quit the program")
+        choice = input("Enter your choice: ")
         try:
-            choice = int(input("What would you like to do?\n[Input number indicating your choice from the above mentioned]: "))
+            choice = int(choice)
         except Exception as e:
-            print("Please enter a valid choice [a single digit in the range 1-6]")
-            exit(1)
-        if(choice not in range(1,7)):
-            print("Your choice is not available among the above listed. Please choose from the above listed options")
-            exit(1)
-        elif(choice == 1): # adding student to student file
-            pass
-        elif(choice == 2): # finding student by student number, displaying all their data
-            pass
-        elif(choice == 3): # for each student , list their data
-            show_all_student_data(students=student_list)
-        elif (choice == 4): # listing students born in a particular year  
-            pass
-        elif (choice == 5): # modify details for student number specified student
-            pass
-        elif (choice == 6): # delete student with specified student number
-            pass 
-        elif (choice == 7): # quit the program
-            pass 
+            print("You entered invalid input.\n Let's try that again")
+            continue
+        if choice == 1:
+            filename = input("Enter filename to save to: ")
+            db.update_database(filename=filename)
+        elif choice == 2:
+            filename = input("Enter filename to load from: ")
+            db.read_from_file(filename)
+        elif choice == 3:
+            student_number = input("Enter student number: ")
+            first_name = input("Enter first name: ")
+            last_name = input("Enter last name: ")
+            date_of_birth = input(f"Enter date of birth (format: {date_format}): ")
+            gender = input("Enter gender (Database only supports Male or Female Genders :\\): ")
+            country_of_birth = input("Enter country of birth: ")
+            student = Student(student_number=student_number, first_name=first_name, last_name=last_name, dob=date_of_birth, gender=gender, country=country_of_birth)
+            db.add_student(student)
+        elif choice == 4:
+            student_number = input("Enter student number to find: ")
+            student = db.find_student_by_number(student_number)
+            if student:
+                print(student)
+            else:
+                print(f"Student with number {student_number} not found.")
+        elif choice == 5:
+            db.show_all_students()
+        elif choice == 6:
+            year = int(input("Enter the year: "))
+            db.show_students_born_in_year(year)
+        elif choice == 7:
+            student_number = input("Enter student number to modify: ")
+            db.modify_student(student_number)
+        elif choice == 8:
+            student_number = input("Enter student number to delete: ")
+            db.remove_student(student_number)
+        elif choice == 9:
+            handle_exit()
+        else:
+            print("Invalid choice, please try again.")
+
+if __name__ == "__main__":
+    menu()
 
 
-if __name__ == '__main__':
-    main()
 
 
 
 
-
-
-
-
-# student_list = [None] * 100
-
-
-# # anything below is just for trying, all can be modified or removed
-# student_list[0] = Student("001", "John", "Doe", "15-05-2000", "M", "USA")
-# student_list[1] = Student("002", "Jane", "Smith", "22-08-2001", "F", "Canada")
-
-
-# export_students(student_list)
-
-
-# new_students = import_students()
-    
-# if new_students[0]:
-#     print(f"Imported student: {new_students[0].get_fn()} {new_students[0].get_ln()}")
