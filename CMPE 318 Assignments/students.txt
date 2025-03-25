@@ -1,0 +1,2 @@
+001|John|Doe|15-05-2000|M|USA
+002|Jane|Smith|22-08-2001|F|Canada
