@@ -8,65 +8,7 @@ class Token:
     def __str__(self):
         return f"<{self.token_type}, {self.extra_info}>"
 
-# Global variables for file content and position
-file_content = ""
-position = 0
-
-# Regex pattern to match all tokens
-# Groups: (int) | (float) | (id) | (&&) | (||) | (&) | (|) | (error)
-pattern = re.compile(
-    r'\s*('  # Skip leading spaces and capture the token
-    r'[+-]*\d+'  # Integer
-    r'|'
-    r'[+-]*\d*\.\d+'  # Float
-    r'|'
-    r'[a-zA-Z][a-zA-Z0-9]*'  # Identifiers
-    r'|'
-    r'&&'  # Logical AND
-    r'|'
-    r'\|\|'  # Logical OR
-    r'|'
-    r'&'  # Bitwise AND
-    r'|'
-    r'\|'  # Bitwise OR
-    r'|'
-    r'[^\s]+'  # Anything else (error)
-    r')'
-)
-
-def lex():
-    global position, file_content
-    if position >= len(file_content):
-        return None  # End of file
-
-    # Find the next token from the current position
-    match = pattern.match(file_content, position)
-    if not match:
-        return None  # No more tokens
-
-    lexeme = match.group(1)  # The matched token
-    position = match.end()   # Update position to end of match
-
-    # Determine token type and extra info
-    if re.fullmatch(r'[+-]*\d+', lexeme):
-        return Token("INTEGER", int(lexeme))
-    elif re.fullmatch(r'[+-]*\d*\.\d+', lexeme):
-        return Token("FLOAT", float(lexeme))
-    elif re.fullmatch(r'[a-zA-Z][a-zA-Z0-9]*', lexeme):
-        index = add_to_symbol_table(lexeme)
-        return Token("ID", index)
-    elif lexeme == "&&":
-        return Token("LOGICAL_AND", "nothing")
-    elif lexeme == "||":
-        return Token("LOGICAL_OR", "nothing")
-    elif lexeme == "&":
-        return Token("BITWISE_AND", "nothing")
-    elif lexeme == "|":
-        return Token("BITWISE_OR", "nothing")
-    else:
-        return Token("ERROR", lexeme)
-    
-# --------------------------------------------------- #
+# Symbol table (global for simplicity)
 symbol_table = []
 
 def add_to_symbol_table(identifier):
@@ -82,42 +24,86 @@ def show_symbol_table():
         for i, ident in enumerate(symbol_table):
             print(f"Index {i}: {ident}")
 
+# Regex pattern for token matching
+pattern = re.compile(
+    r'(?P<token>'  # Capture the entire token
+    r'&&|'         # Logical AND
+    r'\|\||'       # Logical OR
+    r'&|'          # Bitwise AND
+    r'\||'         # Bitwise OR
+    r'-?\d*\.\d+|' # Float
+    r'-?\d+|'      # Integer
+    r'[a-zA-Z][a-zA-Z0-9]*|'  # Identifier
+    r'[^\s]+'      # Error (catch-all)
+    r')(?=\s|$)',  # Ensure token ends at whitespace or end of string
+    re.MULTILINE   # Handle multi-line input
+)
 
-# ---------------------------------------------------------- #
+def lex(file_content):
+    tokens = []
+    line_number = 1
 
+    # Find all matches in the file content
+    for match in pattern.finditer(file_content):
+        lexeme = match.group('token')
+        start_pos = match.start()
+
+        # Update line number based on newlines before this token
+        newlines = file_content[:start_pos].count('\n')
+        line_number = 1 + newlines
+
+        # Determine token type
+        if lexeme == "&&":
+            tokens.append(Token("LOGICAL_AND", "nothing"))
+        elif lexeme == "||":
+            tokens.append(Token("LOGICAL_OR", "nothing"))
+        elif lexeme == "&":
+            tokens.append(Token("BITWISE_AND", "nothing"))
+        elif lexeme == "|":
+            tokens.append(Token("BITWISE_OR", "nothing"))
+        elif re.fullmatch(r'-?\d*\.\d+', lexeme):
+            tokens.append(Token("FLOAT", float(lexeme)))
+        elif re.fullmatch(r'-?\d+', lexeme):
+            tokens.append(Token("INTEGER", int(lexeme)))
+        elif re.fullmatch(r'[a-zA-Z][a-zA-Z0-9]*', lexeme):
+            index = add_to_symbol_table(lexeme)
+            tokens.append(Token("ID", index))
+        else:
+            tokens.append(Token("ERROR", f'"{lexeme}" at line {line_number}'))
+
+    return tokens
+
+# Main program
 def main():
-    global file_content, position
-    
-    
     filename = input("Enter the name of the input file: ")
     try:
         with open(filename, 'r') as f:
             file_content = f.read()
-        position = 0
     except FileNotFoundError:
         print("File not found. Exiting...")
         return
 
+    # Get all tokens at once
+    all_tokens = lex(file_content)
+    token_index = 0  # Track current position in the token list
+
     while True:
-        print("\nMenu:")
+        print("\n=== Lexical Analyzer Menu ===")
         print("1. Call lex()")
         print("2. Show symbol table")
         print("3. Exit")
-        choice = input("Enter your choice: ")
+        choice = input("Enter your choice (1-3): ")
 
         if choice == "1":
-            token = lex()
-            if token:
+            for token in all_tokens:
                 print(token)
-            else:
-                print("End of file reached")
         elif choice == "2":
             show_symbol_table()
         elif choice == "3":
-            print("Exiting...")
+            print("Exiting program. Goodbye!")
             break
         else:
-            print("Invalid choice. Try again.")
+            print("Invalid choice. Please enter 1, 2, or 3.")
 
 if __name__ == "__main__":
     main()
