@@ -271,7 +271,7 @@ def menu():
             student_number = input("Enter student number: ")
             first_name = input("Enter first name: ")
             last_name = input("Enter last name: ")
-            date_of_birth = input(f"Enter date of birth (format: {date_format}): ")
+            date_of_birth = input("Enter date of birth (format: DD-MM-YY): ")
             gender = input("Enter gender (Database only supports Male or Female Genders :\\): ")
             country_of_birth = input("Enter country of birth: ")
             student = Student(student_number=student_number, first_name=first_name, last_name=last_name, dob=date_of_birth, gender=gender, country=country_of_birth)
